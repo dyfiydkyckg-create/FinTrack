@@ -1,0 +1,14 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/config/database.php';
+require_once __DIR__.'/includes/functions.php';
+$month=(string)($_GET['month']??current_month());if(!preg_match('/^\d{4}-\d{2}$/',$month))$month=current_month();
+$stmt=$pdo->prepare("SELECT COALESCE(SUM(CASE WHEN type='income' THEN amount ELSE 0 END),0) income,COALESCE(SUM(CASE WHEN type='expense' THEN amount ELSE 0 END),0) expense,COUNT(*) count FROM transactions WHERE DATE_FORMAT(transaction_date,'%Y-%m')=?");$stmt->execute([$month]);$summary=$stmt->fetch();
+$catStmt=$pdo->prepare("SELECT c.name,c.icon,SUM(t.amount) total FROM transactions t JOIN categories c ON c.id=t.category_id WHERE t.type='expense' AND DATE_FORMAT(t.transaction_date,'%Y-%m')=? GROUP BY c.id ORDER BY total DESC");$catStmt->execute([$month]);$categories=$catStmt->fetchAll();
+$totalExpense=(float)$summary['expense'];
+$pageTitle='گزارش‌ها';$activePage='reports';require __DIR__.'/includes/header.php';
+?>
+<section class="panel report-filter"><div><h3>گزارش مالی ماهانه</h3><p>خلاصه عملکرد مالی خود را برای ماه دلخواه ببینید.</p></div><form method="get"><label for="month">انتخاب ماه</label><input id="month" type="month" name="month" value="<?= e($month) ?>"><button class="button button-dark">نمایش گزارش</button></form></section>
+<section class="stats-grid report-stats"><article class="stat-card"><div class="stat-top"><span>درآمد ماه</span><span class="stat-icon green">↙</span></div><strong class="stat-value"><?= money($summary['income']) ?></strong></article><article class="stat-card"><div class="stat-top"><span>هزینه ماه</span><span class="stat-icon orange">↗</span></div><strong class="stat-value"><?= money($summary['expense']) ?></strong></article><article class="stat-card"><div class="stat-top"><span>خالص ماه</span><span class="stat-icon purple">◈</span></div><strong class="stat-value"><?= money((float)$summary['income']-(float)$summary['expense']) ?></strong></article></section>
+<section class="panel table-panel"><div class="panel-heading"><div><h3>هزینه بر اساس دسته‌بندی</h3><p>سهم هر دسته از کل هزینه‌های ماه</p></div><span class="date-chip"><?= e($month) ?></span></div><?php if(!$categories): ?><div class="empty-state compact"><span>▥</span><strong>هزینه‌ای در این ماه ثبت نشده است</strong><p>پس از ثبت هزینه‌ها، تحلیل دسته‌بندی اینجا نمایش داده می‌شود.</p></div><?php else: foreach($categories as $cat): $share=$totalExpense>0?(float)$cat['total']/$totalExpense*100:0; ?><div class="report-row"><div class="report-label"><strong><?= e($cat['icon'].' '.$cat['name']) ?></strong><span><?= money($cat['total']) ?> · <?= number_format($share,1) ?>٪</span></div><div class="progress"><span style="width:<?= $share ?>%"></span></div></div><?php endforeach; ?><div class="report-total"><span>مجموع هزینه‌ها</span><strong><?= money($totalExpense) ?></strong></div><?php endif; ?></section>
+<?php require __DIR__.'/includes/footer.php'; ?>
