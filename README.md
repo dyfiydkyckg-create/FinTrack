@@ -46,6 +46,7 @@ FinTrack/
 ├── budgets.php
 ├── index.php
 ├── reports.php
+├── edit.php
 ├── transaction-create.php
 ├── transaction-delete.php
 ├── transactions.php
@@ -91,7 +92,7 @@ php -S localhost:8000
 
 ## 🧭 مسیر توسعه
 
-- [ ] ویرایش تراکنش‌ها
+- [x] ویرایش تراکنش‌ها
 - [ ] خروجی CSV از گزارش‌ها
 - [ ] فیلتر بازه زمانی سفارشی
 - [ ] نمودارهای تعاملی پیشرفته
