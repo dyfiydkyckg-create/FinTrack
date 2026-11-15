@@ -36,7 +36,7 @@ require __DIR__.'/includes/header.php';
 <?php if ($errors): ?><div class="alert alert-error"><?php foreach($errors as $error): ?><div><?= e($error) ?></div><?php endforeach; ?></div><?php endif; ?>
 <form method="post" class="form-grid">
 <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
-<div class="field full"><label>نوع تراکنش</label><div class="type-switch"><label><input type="radio" name="type" value="expense" <?= $type==='expense'?'checked':'' ?> onchange="this.form.submit()"> هزینه</label><label><input type="radio" name="type" value="income" <?= $type==='income'?'checked':'' ?> onchange="this.form.submit()"> درآمد</label></div></div>
+<div class="field full"><label>نوع تراکنش</label><div class="type-switch"><label><input type="radio" name="type" value="expense" <?= $type==='expense'?'checked':'' ?> onchange="window.location='transaction-create.php?type='+this.value"> هزینه</label><label><input type="radio" name="type" value="income" <?= $type==='income'?'checked':'' ?> onchange="window.location='transaction-create.php?type='+this.value"> درآمد</label></div></div>
 <div class="field full"><label for="title">عنوان تراکنش</label><input id="title" name="title" maxlength="160" required placeholder="مثلاً خرید هفتگی یا حقوق ماهانه" value="<?= e($_POST['title']??'') ?>"></div>
 <div class="field"><label for="amount">مبلغ (<?= e(getenv('APP_CURRENCY') ?: 'تومان') ?>)</label><input id="amount" name="amount" type="number" min="1" step="1" required placeholder="مثلاً ۲۵۰۰۰۰" value="<?= e($_POST['amount']??'') ?>"></div>
 <div class="field"><label for="transaction_date">تاریخ</label><input id="transaction_date" name="transaction_date" type="date" required value="<?= e($_POST['transaction_date']??date('Y-m-d')) ?>"></div>
